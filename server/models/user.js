@@ -10,9 +10,11 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
     }
+    
     static passwordMatches(password, modelPassword) {
       return bcrypt.compare(password, modelPassword)
     }
+
     static sign(user) {
       const token = jwt.sign(
         {
@@ -25,6 +27,12 @@ module.exports = (sequelize, DataTypes) => {
       );
 
       return token;
+    }
+
+    static async passwordHash(password) {
+      const hash = await bcrypt.hash(password, config.env === 'development' ? 1 : 10)
+
+      return hash;
     }
   };
   User.init({
@@ -43,7 +51,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     confirmed: {
       type: DataTypes.BOOLEAN,
-      allowNull: false
+      allowNull: true
     },
     email: {
       type: DataTypes.STRING,

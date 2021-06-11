@@ -95,93 +95,132 @@ const get = async (req, res) => {
     });
   }
 }
+/**
+ * Register new user
+ * @returns {User}
+ */
+const register = async (req, res, next) => {
+  const { name, email, username, birthday, cpf, password } = req.body;
+  const t = await sequelize.transaction();
+  try {
+    const foundUser = await User.findOne({
+      where: {
+        [Op.or]: {
+          cpf,
+          email,
+          username
+        }
+      }, attributes: ['id', 'cpf', 'email', 'username']
+    })
+    if(foundUser) {
+      if(foundUser.cpf === cpf)
+        throw new APIError("Um cadastro já foi realizado com este cpf.");
+      if(foundUser.email === email)
+        throw new APIError("Um cadastro já foi realizado com este endereço de e-mail.");
+      if(foundUser.username === username)
+        throw new APIError("Este login já está sendo utilizado.");
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    if (!emailRegex.test(email)) {
+      throw new APIError("Endereço de E-mail inválido.");
+    }
+
+    const hash = await User.passwordHash(password);
+    
+    const createdUser = await User.create({
+      cpf,
+      name,
+      email,
+      username,
+      birthday,
+      password: hash,
+      role: 0,
+      photo: null,
+      confirmed: null,
+      active: false
+    }, {transaction: t})
+
+    if(!createdUser)
+      throw new APIError("Houve um erro ao criar seu pedido de cadastro.");
+
+    await t.commit();
+    return res.json({
+      message: "Seu cadastro foi enviado para aprovação com sucesso!",
+      success: true
+    });
+  } catch (err) {
+    await t.rollback();
+    return res.status(err.status ? err.status : 500).json({
+      message: err.message,
+      success: false,
+      status: err.status ? err.status : 500
+    });
+  }
+}
 
 /**
  * Create new user
  * @returns {User}
  */
 const create = async (req, res, next) => {
-  const { name, phone, email, username, roleId, active } = req.body;
+  const { name, email, username, birthday, cpf, password='1234ab', role=2 } = req.body;
   const { user } = req;
 
   const t = await sequelize.transaction();
-  const u = await sequelize.transaction();
   try {
-    if (!user.roleIds.includes(1)) {
+    if (user.role !== 1) {
       throw new APIError("Você não tem permissão para criar usuários.");
     }
 
-    if (roleId == 5) {
-      throw new APIError("Não é possível fazer criação de alunos.");
-    }
-
-    const checkEmail = await User.findAndCountAll({
+    const foundUser = await User.findOne({
       where: {
         [Op.or]: {
+          cpf,
           email,
-          username: replaceSpecialChars(username)
+          username
         }
-      }
-    });
-
-    if (checkEmail.count > 0) {
-      throw new APIError("E-mail ou nome de usuário já cadastrados na plataforma.");
+      }, attributes: ['id', 'cpf', 'email', 'username']
+    })
+    if(foundUser) {
+      if(foundUser.cpf === cpf)
+        throw new APIError("Um cadastro já foi realizado com este cpf.");
+      if(foundUser.email === email)
+        throw new APIError("Um cadastro já foi realizado com este endereço de e-mail.");
+      if(foundUser.username === username)
+        throw new APIError("Este login já está sendo utilizado.");
     }
 
-    const key = crypto.MD5(email + new Date());
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    if (!emailRegex.test(email)) {
+      throw new APIError("Endereço de E-mail inválido.");
+    }
 
-    const newUser = await User.create({
+    const hash = await User.passwordHash(password);
+    
+    const createdUser = await User.create({
+      cpf,
       name,
-      key: key.toString(),
-      confirmed: false,
-      phone,
       email,
-      active,
+      username,
+      birthday,
+      password: hash,
+      role,
       photo: null,
-      username: replaceSpecialChars(username),
-      dtbirth: '',
-      cpf: null,
-      tour: false,
-      connected: false,
-      ip_connected: ''
-    }, { transaction: t });
+      confirmed: true,
+      active: true
+    }, {transaction: t})
 
-    if (!newUser) {
-      throw new APIError("Houve um erro ao criar o usuário.");
-    }
-
-    const newUserRoleInstitution = await User_Role_Institution.create({
-      UserId: newUser.id,
-      RoleId: roleId,
-      InstitutionId: null
-    }, { transaction: t });
-
-    if (!newUserRoleInstitution) {
-      throw new APIError("Houve um erro na criação das permissões do usuário.")
-    }
-
-    if (roleId !== 4) {
-      if (!(await EmailProvider.sendPasswordReset(newUser))) {
-        throw new APIError("Houve um erro ao processar o envio de e-mail.");
-      }
-    }
-
-    if (roleId === 4) {
-      if (!(await EmailProvider.sendUserConfirmation(newUser))) {
-        throw new APIError("Houve um erro ao processar o envio de e-mail.");
-      }
-    }
+    if(!createdUser)
+      throw new APIError("Houve um erro ao cadastrar usuário.");
 
     await t.commit();
-    await u.commit();
-
     return res.json({
-      success: true,
-      message: 'Usuário criado com sucesso!'
-    })
+      message: "Usuário cadastrado com senha padrão '1234ab'!",
+      success: true
+    });
   } catch (err) {
     await t.rollback();
-    await u.rollback();
     return res.status(err.status ? err.status : 500).json({
       message: err.message,
       success: false,
@@ -870,9 +909,12 @@ const getUserAreas = async (req, res, next) => {
  */
 
 export default {
+  register,
+  create, 
+
+
   load, 
   get, 
-  create, 
   update, 
   list, 
   changePassword, 

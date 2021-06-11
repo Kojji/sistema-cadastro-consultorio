@@ -2,15 +2,27 @@ import { Joi } from 'express-validation'
 import { allow, valid } from 'joi/lib/types/lazy';
 
 export default {
+    // POST /api/users/register
+    registerUser: {
+        body: Joi.object({
+          name: Joi.string().required(),
+          email: Joi.string().required(),
+          password: Joi.string().required(),
+          username: Joi.string().required(),
+          cpf: Joi.string().required(),
+          birthday: Joi.string().required(),
+      }),
+    },
+
     // POST /api/users
     createUser: {
         body: Joi.object({
           name: Joi.string().required(),
           email: Joi.string().required(),
-          phone: Joi.string().required(),
           username: Joi.string().required(),
-          active: Joi.boolean().required(),
-          roleId: Joi.number().required(),
+          birthday: Joi.string().required(),
+          cpf: Joi.string().required(),
+          role: Joi.number().valid(1,2).required()
       }),
     },
 

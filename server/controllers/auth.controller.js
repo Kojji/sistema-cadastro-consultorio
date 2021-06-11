@@ -49,7 +49,6 @@ const login = async (req, res, next) => {
         "birthday",
         "cpf",
         "createdAt",
-        "updatedAt",
         "role",
         "active"
       ],
@@ -57,6 +56,13 @@ const login = async (req, res, next) => {
 
     if (!user) {
       throw new APIError("Este usuário não existe.");
+    }
+
+    if (user.confirmed === null) {
+      throw new APIError("Conta de Usuário ainda não foi aceita pelo adminstrador.");
+    }
+    if (!user.confirmed) {
+      throw new APIError("Conta de Usuário recusada pelo administrador.");
     }
 
     if (!user.active) {
@@ -70,55 +76,22 @@ const login = async (req, res, next) => {
     const token = User.sign(user);
 
     // const menus = User.sideMenu(roles, user.User_Permissions);
-    // let redirect = '/mural/professor'
-
-    // if (roles.includes(5)) {
-    //   redirect = '/mural/aluno'
-    // }
-
-    // const getTokenControl = await Token_Control.findOne({
-    //   where: { UserId: user.id },
-    //   attributes: ['id', 'active']
-    // })
-    // if(!getTokenControl) {
-    //   await Token_Control.create({
-    //     UserId: user.id,
-    //     ip: '',
-    //     active: true,
-    //     token
-    //   })
-    // } else {
-    //   await getTokenControl.update({
-    //     active: true,
-    //     token
-    //   })
-    // }
 
     return res.json({
       token,
-      data: user,
-      // user: {
-      //   id: user.id,
-      //   name: user.name,
-      //   username: user.username,
-      //   email: user.email,
-      //   phone: user.phone,
-      //   photo: user.photo,
-      //   confirmed: user.confirmed,
-      //   createdAt: user.createdAt,
-      //   updatedAt: user.updatedAt,
-      //   profession: user.profession,
-      //   Areas: user.User_Areas.map((element) => {
-      //     return {AreaId: element.Area.id, title: element.Area.title }
-      //   }),
-      //   dtbirth: user.dtbirth,
-      //   cpf: user.cpf,
-      //   rg: user.rg,
-      //   roles: rolesObj,
-      //   InstitutionId: roles.includes(4) ? user.InstitutionId : undefined,
-      // },
-      // rows: menus,
-      // redirect,
+      user: {
+        id: user.id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        photo: user.photo,
+        confirmed: user.confirmed,
+        createdAt: user.createdAt,
+        role: user.role,
+        birthday: user.birthday,
+        cpf: user.cpf,
+      },
+      redirect: '/dashboard',
       success: true
     })
 
@@ -143,33 +116,14 @@ const token = async (req, res, next) => {
         "name",
         "username",
         "email",
-        "phone",
         "photo",
         "confirmed",
-        "password",
-        "profession",
-        "InstitutionId",
-        "dtbirth",
+        "birthday",
         "cpf",
-        "rg",
         "createdAt",
-        "updatedAt",
+        "role",
         "active"
       ],
-      include: [
-        { model: Institution, attributes: ['id', 'schemaname', 'name', 'photo', 'cep', 'city', 'state', 'district', 'address', 'number', 'complement', 'phone', 'timezone'] },
-        { model: User_Role_Institution, attributes: ['UserId', 'RoleId'], include: [{ model: Role }] },
-        { 
-          model: User_Area, 
-          include: [
-            { model: Area, attributes: ['id', 'title'] }
-          ], attributes: ['id']
-        },
-        {
-          model: User_Permission,
-          attributes: ['PermissionId']
-        }
-      ]
     });
 
     if (!foundUser) {
@@ -180,67 +134,9 @@ const token = async (req, res, next) => {
       throw new APIError("Usuário inativado pelo sistema.");
     }
 
-    let get_isStudent = null;
-    let get_isProfessor = null;
-    if(foundUser.InstitutionId) {
-      get_isStudent = await Student.schema(foundUser.Institution.schemaname).findOne({ where: { UserId: foundUser.id }, attributes: ['id', 'GradeId', 'LevelId', 'active'] })
-      get_isProfessor = await Professor.schema(foundUser.Institution.schemaname).findOne({ where: { UserId: foundUser.id }, attributes: ['id', 'institution_email', 'institution_phone'] })
-    }
-    
-    const token = User.sign(foundUser, get_isProfessor? get_isProfessor.id : null, get_isStudent? get_isStudent.id : null);
+    const token = User.sign(foundUser);
 
-    const getRoles = await User_Role_Institution.findAll({
-      where: {
-        InstitutionId: foundUser.InstitutionId,
-        UserId: foundUser.id
-      },
-      attributes: ['UserId', 'RoleId'],
-      include: [{ model: Role }]
-    });
-
-    let roles = null;
-    let rolesObj = null;
-
-    if (!!getRoles) {
-      roles = getRoles.map(role => role.RoleId);
-      rolesObj = getRoles.map(role => ({
-        id: role.RoleId,
-        title: role.Role.title
-      }));
-    } else {
-      roles = foundUser.User_Role_Institutions.map(role => role.RoleId);
-      rolesObj = foundUser.User_Role_Institutions.map(role => ({
-        id: role.RoleId,
-        title: role.Role.title
-      }));
-    }
-
-    const menus = User.sideMenu(roles, foundUser.User_Permissions);
-    let redirect = '/mural/professor'
-
-    let getProfessor = null
-    if (roles.includes(4) && foundUser.InstitutionId) {
-      getProfessor = await Professor.schema(foundUser.Institution.schemaname).findOne({ where: { UserId: foundUser.id }, attributes: ['id', 'institution_email', 'institution_phone'] })
-    }
-
-    let getStudent = null
-    if (roles.includes(5) && foundUser.InstitutionId) {
-      getStudent = await Student.schema(foundUser.Institution.schemaname).findOne({ where: { UserId: foundUser.id }, attributes: ['id', 'GradeId', 'LevelId', 'active'] })
-      redirect = '/mural/aluno'
-    }
-
-    const getTokenControl = await Token_Control.findOne({
-      where: { UserId: user.id },
-      attributes: ['id']
-    })
-    if(!getTokenControl) {
-      throw new APIError("Token de acesso precisa ser renovado.");
-    } else {
-      await getTokenControl.update({
-        token,
-        active: true
-      })
-    }
+    // const menus = User.sideMenu(roles, foundUser.User_Permissions);
 
     return res.json({
       token,
@@ -249,40 +145,14 @@ const token = async (req, res, next) => {
         name: foundUser.name,
         username: foundUser.username,
         email: foundUser.email,
-        phone: foundUser.phone,
         photo: foundUser.photo,
         confirmed: foundUser.confirmed,
         createdAt: foundUser.createdAt,
-        updatedAt: foundUser.updatedAt,
-        profession: foundUser.profession,
-        dtbirth: foundUser.dtbirth,
+        role: foundUser.role,
+        birthday: foundUser.birthday,
         cpf: foundUser.cpf,
-        rg: foundUser.rg,
-        User_Permissions: foundUser.User_Permissions,
-        Areas: foundUser.User_Areas.map((element) => {
-          return {AreaId: element.Area.id, title: element.Area.title }
-        }),
-        Institution: foundUser.InstitutionId ? {
-          id: foundUser.Institution.id,
-          name: foundUser.Institution.name,
-          photo: foundUser.Institution.photo,
-          cep: foundUser.Institution.cep,
-          city: foundUser.Institution.city,
-          state: foundUser.Institution.state,
-          district: foundUser.Institution.district,
-          address: foundUser.Institution.address,
-          number: foundUser.Institution.number,
-          complement: foundUser.Institution.complement,
-          phone: foundUser.Institution.phone,
-          timezone: foundUser.Institution.timezone,
-          professor: getProfessor,
-          student: getStudent
-        } : null,
-        roles: rolesObj,
-        InstitutionId: roles.includes(4) || roles.includes(5) ? foundUser.InstitutionId : undefined
       },
-      rows: menus,
-      redirect,
+      redirect: '/dashboard',
       success: true
     })
 

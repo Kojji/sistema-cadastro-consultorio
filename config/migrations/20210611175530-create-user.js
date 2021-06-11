@@ -32,7 +32,7 @@ module.exports = {
       },
       confirmed: {
         type: Sequelize.BOOLEAN,
-        allowNull: false
+        allowNull: true
       },
       photo: {
         type: Sequelize.TEXT,

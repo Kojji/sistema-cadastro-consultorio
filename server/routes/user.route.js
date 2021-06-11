@@ -13,6 +13,13 @@ const upload = multer({ storage: storage });
 
 const router = express.Router(); // eslint-disable-line new-cap
 
+router.route('/register')
+  .post(validate(paramValidation.registerUser, {
+    context: false,
+    keyByField: true,
+    statusCode: 400
+  }, {}), userCtrl.register
+  );
 router.route('/fetch')
 
   /** GET /api/users/fetch - Get list of users by name */
