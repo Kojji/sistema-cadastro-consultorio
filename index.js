@@ -4,7 +4,7 @@ import app from './config/express';
 /* eslint-disable no-unused-vars */
 import db from './server/models';
 
-const debug = require('debug')('fabio-mariani-api:index');
+const debug = require('debug')('sistema-cadastro-consultorio-api:index');
 /* eslint-enable no-unused-vars */
 
 // Get default logger

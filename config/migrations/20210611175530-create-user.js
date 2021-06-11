@@ -21,14 +21,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true
       },
-      key: {
-        type: Sequelize.STRING,
-        allowNull: true
-      },
-      phone: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
       email: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -46,43 +38,7 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: true
       },
-      tour: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false
-      },
-      InstitutionId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: {
-            tableName: 'Institutions'
-          },
-          key: 'id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
-        allowNull: true
-      },
-      connected: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false
-      },
-      ip_connected: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      AreaId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: {
-            tableName: 'Areas'
-          },
-          key: 'id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
-        allowNull: true
-      },
-      dtbirth: {
+      birthday: {
         type: Sequelize.STRING,
         allowNull: true
       },
@@ -91,14 +47,9 @@ module.exports = {
         allowNull: true,
         unique: true
       },
-      rg: {
-        type: Sequelize.STRING,
-        allowNull: true,
-        unique: true
-      },
-      profession: {
-        type: Sequelize.STRING,
-        allowNull: true
+      role: {
+        type: Sequelize.INTEGER,
+        allowNull: false
       },
       createdAt: {
         allowNull: false,
