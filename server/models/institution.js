@@ -10,8 +10,6 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      models.Institution.hasMany(models.User_Role_Institution)
-      models.Institution.hasMany(models.User)
       models.Institution.hasMany(models.File)
     }
   };

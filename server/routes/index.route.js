@@ -30,29 +30,29 @@ import studyGroupRoutes from './study-group.route';
 import db from '../models';
 
 const router = express.Router(); // eslint-disable-line new-cap
-const { Token_Control, sequelize } = db;
+// const { Token_Control, sequelize } = db;
 
-router.use(async function (req, res, next) {
-  console.log(req.header('Authorization'))
-  if(!!req.header('Authorization')) {
-    let token = req.header('Authorization').replace('Bearer ', '')
-    const foundToken = await Token_Control.findOne({
-      where: {token},
-      attributes: ['id', 'UserId']
-    })
-    if(!foundToken) {
-      return res.json({
-        message: "token de acesso precisa ser renovado",
-        success: false,
-        redirect: '/login'
-      });
-    } else {
-      next()
-    }
-  } else {
-    next();
-  }
-});
+// router.use(async function (req, res, next) {
+//   console.log(req.header('Authorization'))
+//   if(!!req.header('Authorization')) {
+//     let token = req.header('Authorization').replace('Bearer ', '')
+//     const foundToken = await Token_Control.findOne({
+//       where: {token},
+//       attributes: ['id', 'UserId']
+//     })
+//     if(!foundToken) {
+//       return res.json({
+//         message: "token de acesso precisa ser renovado",
+//         success: false,
+//         redirect: '/login'
+//       });
+//     } else {
+//       next()
+//     }
+//   } else {
+//     next();
+//   }
+// });
 
 // mount user routes at /users
 router.use('/users', userRoutes);

@@ -43,33 +43,16 @@ const login = async (req, res, next) => {
         "name",
         "username",
         "email",
-        "phone",
         "photo",
         "confirmed",
         "password",
-        "profession",
-        "InstitutionId",
-        "dtbirth",
+        "birthday",
         "cpf",
-        "rg",
         "createdAt",
         "updatedAt",
+        "role",
         "active"
       ],
-      include: [
-        { model: Institution, attributes: ['id', 'schemaname', 'name', 'photo'] },
-        { model: User_Role_Institution, attributes: ['UserId', 'RoleId'], include: [{ model: Role }] },
-        { 
-          model: User_Area, 
-          include: [
-            { model: Area, attributes: ['id', 'title'] }
-          ], attributes: ['id']
-        },
-        {
-          model: User_Permission,
-          attributes: ['PermissionId']
-        }
-      ]
     });
 
     if (!user) {
@@ -77,97 +60,65 @@ const login = async (req, res, next) => {
     }
 
     if (!user.active) {
-      throw new APIError("Usuário inativado pelo sistema.");
+      throw new APIError("Usuário inativo no sistema.");
     }
 
     if (!(await User.passwordMatches(password, user.password))) {
       throw new APIError("Os campos e-mail e/ou senha estão inválidos.");
     }
 
-    let getStudent = null;
-    let getProfessor = null;
-    if(user.InstitutionId) {
-      getStudent = await Student.schema(user.Institution.schemaname).findOne({ where: { UserId: user.id }, attributes: ['id', 'GradeId', 'LevelId', 'active'] })
-      getProfessor = await Professor.schema(user.Institution.schemaname).findOne({ where: { UserId: user.id }, attributes: ['id', 'institution_email', 'institution_phone'] })
-    }
-    
-    const token = User.sign(user, getProfessor? getProfessor.id : null, getStudent? getStudent.id : null);
+    const token = User.sign(user);
 
-    const getRoles = await User_Role_Institution.findAll({
-      where: {
-        InstitutionId: user.InstitutionId,
-        UserId: user.id
-      },
-      attributes: ['UserId', 'RoleId'],
-      include: [{ model: Role }]
-    });
+    // const menus = User.sideMenu(roles, user.User_Permissions);
+    // let redirect = '/mural/professor'
 
-    let roles = null;
-    let rolesObj = null;
+    // if (roles.includes(5)) {
+    //   redirect = '/mural/aluno'
+    // }
 
-    if (!!getRoles) {
-      roles = getRoles.map(role => role.RoleId);
-      rolesObj = getRoles.map(role => ({
-        id: role.RoleId,
-        title: role.Role.title
-      }));
-    } else {
-      roles = user.User_Role_Institutions.map(role => role.RoleId);
-      rolesObj = user.User_Role_Institutions.map(role => ({
-        id: role.RoleId,
-        title: role.Role.title
-      }));
-    }
-
-    const menus = User.sideMenu(roles, user.User_Permissions);
-    let redirect = '/mural/professor'
-
-    if (roles.includes(5)) {
-      redirect = '/mural/aluno'
-    }
-
-    const getTokenControl = await Token_Control.findOne({
-      where: { UserId: user.id },
-      attributes: ['id', 'active']
-    })
-    if(!getTokenControl) {
-      await Token_Control.create({
-        UserId: user.id,
-        ip: '',
-        active: true,
-        token
-      })
-    } else {
-      await getTokenControl.update({
-        active: true,
-        token
-      })
-    }
+    // const getTokenControl = await Token_Control.findOne({
+    //   where: { UserId: user.id },
+    //   attributes: ['id', 'active']
+    // })
+    // if(!getTokenControl) {
+    //   await Token_Control.create({
+    //     UserId: user.id,
+    //     ip: '',
+    //     active: true,
+    //     token
+    //   })
+    // } else {
+    //   await getTokenControl.update({
+    //     active: true,
+    //     token
+    //   })
+    // }
 
     return res.json({
       token,
-      user: {
-        id: user.id,
-        name: user.name,
-        username: user.username,
-        email: user.email,
-        phone: user.phone,
-        photo: user.photo,
-        confirmed: user.confirmed,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-        profession: user.profession,
-        Areas: user.User_Areas.map((element) => {
-          return {AreaId: element.Area.id, title: element.Area.title }
-        }),
-        dtbirth: user.dtbirth,
-        cpf: user.cpf,
-        rg: user.rg,
-        roles: rolesObj,
-        InstitutionId: roles.includes(4) ? user.InstitutionId : undefined,
-      },
-      rows: menus,
-      redirect,
+      data: user,
+      // user: {
+      //   id: user.id,
+      //   name: user.name,
+      //   username: user.username,
+      //   email: user.email,
+      //   phone: user.phone,
+      //   photo: user.photo,
+      //   confirmed: user.confirmed,
+      //   createdAt: user.createdAt,
+      //   updatedAt: user.updatedAt,
+      //   profession: user.profession,
+      //   Areas: user.User_Areas.map((element) => {
+      //     return {AreaId: element.Area.id, title: element.Area.title }
+      //   }),
+      //   dtbirth: user.dtbirth,
+      //   cpf: user.cpf,
+      //   rg: user.rg,
+      //   roles: rolesObj,
+      //   InstitutionId: roles.includes(4) ? user.InstitutionId : undefined,
+      // },
+      // rows: menus,
+      // redirect,
       success: true
     })
 
