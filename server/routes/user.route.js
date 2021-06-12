@@ -5,7 +5,6 @@ import userCtrl from '../controllers/user.controller';
 import expressJwt from "express-jwt";
 import config from "../../config/vars";
 import multer from 'multer';
-import path from 'path';
 
 const storage = multer.memoryStorage();
 
@@ -20,12 +19,17 @@ router.route('/register')
     statusCode: 400
   }, {}), userCtrl.register
   );
-router.route('/fetch')
+
+router.route('/edit/:userId')
 
   /** GET /api/users/fetch - Get list of users by name */
-  .get(expressJwt({
+  .put(expressJwt({
     secret: config.jwtSecret,
-  }), userCtrl.fetchUser
+  }),validate(paramValidation.editUser, {
+    context: false,
+    keyByField: true,
+    statusCode: 400
+  }, {}), userCtrl.updateByAdmin
   );
 
 router.route('/')
@@ -45,18 +49,10 @@ router.route('/')
     statusCode: 400
   }, {}), userCtrl.create);
 
-router.route('/send-email-activation/:userId')
+router.route('/reset/:userId')
   .post(expressJwt({
     secret: config.jwtSecret,
-  }), userCtrl.sendEmailActivation);
-
-router.route('/activate-user/:userId')
-  .post(expressJwt({
-    secret: config.jwtSecret,
-  }), userCtrl.activateUser);
-
-router.route('/update-status')
-  .post(userCtrl.updateStatus);
+  }), userCtrl.resetPassword);
 
 router.route('/:userId')
 
@@ -74,15 +70,15 @@ router.route('/:userId')
     statusCode: 400
   }, {}), userCtrl.update);
 
-router.route('/upload/:userId')
+router.route('/upload')
   .post(
     expressJwt({ secret: config.jwtSecret }),
     upload.single('file'),
     userCtrl.createUserImageUpload
   )
 
-router.route('/change-password/:userId')
-  .put(expressJwt({
+router.route('/change-password')
+  .post(expressJwt({
     secret: config.jwtSecret,
   }),
     validate(paramValidation.changePassword, {
@@ -91,31 +87,5 @@ router.route('/change-password/:userId')
       statusCode: 400
     }, {}),
     userCtrl.changePassword)
-
-router.route('/confirm-account/:key')
-  .put(validate(paramValidation.confirmAccount, {
-    context: false,
-    keyByField: true,
-    statusCode: 400
-  }, {}), (userCtrl.confirmAccount))
-
-router.route('/update-institution-professor/:userId/:institutionId')
-  .post(expressJwt({
-    secret: config.jwtSecret,
-  }),
-    userCtrl.updateInstitutionProfessor)
-
-router.route('/areas/:areaId')
-  .post(
-    expressJwt({ secret: config.jwtSecret }),
-    userCtrl.insertAreatoUser
-  )
-  .delete(
-    expressJwt({ secret: config.jwtSecret }),
-    userCtrl.removeAreafromUser
-  )
-
-/** Load user when API with userId route parameter is hit */
-router.param('userId', userCtrl.load);
 
 export default router;

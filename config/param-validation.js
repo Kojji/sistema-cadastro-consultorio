@@ -29,57 +29,39 @@ export default {
     // UPDATE /api/users/:userId
     updateUser: {
       body: Joi.object({
-        name: Joi.string(),
-        email: Joi.string(),
-        phone: Joi.string().allow(""),
-        username: Joi.string(),
-        dtbirth: Joi.string(),
-        cpf: Joi.string().allow("").allow(null),
-        rg: Joi.string().allow("").allow(null),
-        profession: Joi.string().allow("").allow(null),
+        name: Joi.string().required(),
+        email: Joi.string().required(),
+        username: Joi.string().required(),
+        birthday: Joi.string().required()
       }),
       params: Joi.object({
         userId: Joi.string().hex().required(),
       }),
     },
 
-    // UPDATE /api/institutions/:institutionId
-    updateInstitution: {
+    // UPDATE /api/users/edit/:userId
+    editUser: {
       body: Joi.object({
-        name: Joi.string().required(),
-        phone: Joi.string().allow("").required(),
-        cep: Joi.string().required(),
-        district: Joi.string().required(),
-        address: Joi.string().required(),
-        number: Joi.string().required(),
-        complement: Joi.string().allow("").required(),
+        name: Joi.string().required(), 
+        username: Joi.string().required(), 
+        birthday: Joi.string().required(), 
+        email: Joi.string().required(), 
+        cpf: Joi.string().required(), 
+        role: Joi.number().required(), 
+        confirmed: Joi.boolean().required(), 
+        active: Joi.boolean().required(), 
       }),
       params: Joi.object({
-        institutionId: Joi.string().hex().required(),
+        userId: Joi.string().hex().required(),
       }),
     },
 
     // UPDATE /api/users/change-password/:userId
     changePassword: {
-        body: Joi.object({
-          oldPassword: Joi.string().required(),
-          newPassword: Joi.string().required(),
-          repeatPassword: Joi.string().required(),
-          sure: Joi.boolean().required()
-      }),
-        params: Joi.object({
-          userId: Joi.string().hex().required(),
-      }),
-    },
-
-    // POST /api/users/confirm-account/:key
-    confirmAccount: {
-        body: Joi.object({
-            confirmed: Joi.boolean().required()
-        }),
-        params: Joi.object({
-            key: Joi.string().required(),
-        }),
+      body: Joi.object({
+        oldPassword: Joi.string().required(),
+        password: Joi.string().required()
+      })
     },
 
     // POST /api/auth/login
