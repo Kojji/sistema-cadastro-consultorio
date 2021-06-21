@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
     }
-    
+
     static passwordMatches(password, modelPassword) {
       return bcrypt.compare(password, modelPassword)
     }
@@ -33,6 +33,35 @@ module.exports = (sequelize, DataTypes) => {
       const hash = await bcrypt.hash(password, config.env === 'development' ? 1 : 10)
 
       return hash;
+    }
+
+    static sideMenu(role) {
+      const menu = [];
+      
+      if (role === 1) {
+        menu.push({
+          label: 'Fichas',
+          url: '/fichas',
+          external: false,
+          icon: 'topic'
+        })
+
+        menu.push({
+          label: 'Usuários',
+          url: '/usuarios',
+          external: false,
+          icon: 'group'
+        })
+      } else if(role === 2) {
+        menu.push({
+          label: 'Fichas',
+          url: '/fichas',
+          external: false,
+          icon: 'topic'
+        })
+      }
+
+      return menu;
     }
   };
   User.init({

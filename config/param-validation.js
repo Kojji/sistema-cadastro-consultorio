@@ -30,8 +30,7 @@ export default {
     updateUser: {
       body: Joi.object({
         name: Joi.string().required(),
-        email: Joi.string().required(),
-        username: Joi.string().required(),
+        cpf: Joi.string().required(),
         birthday: Joi.string().required()
       }),
       params: Joi.object({
@@ -56,11 +55,20 @@ export default {
       }),
     },
 
-    // UPDATE /api/users/change-password/:userId
+    // POST /api/users/change-password
     changePassword: {
       body: Joi.object({
         oldPassword: Joi.string().required(),
         password: Joi.string().required()
+      })
+    },
+
+    // POST /api/users/change-login
+    changeLogin: {
+      body: Joi.object({
+        oldPassword: Joi.string().required(),
+        username: Joi.string().required(),
+        email: Joi.string().required()
       })
     },
 

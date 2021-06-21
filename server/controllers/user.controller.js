@@ -10,38 +10,9 @@ import fs from 'fs-extra';
 import { writeFile } from 'fs';
 import { Op } from 'sequelize';
 
-const { User, 
-  Area,
-  User_Area,
-  Token_Control, 
-  User_Role_Institution, 
-  Institution, 
-  Professor, 
+const { User,
   sequelize 
 } = db;
-
-/**
- * Load user and append to req.
- */
-const load = async (req, res, next, id) => {
-  try {
-    const user = await User.findOne({ where: { id } })
-
-    if (!user) {
-      throw new APIError("Este usuário não existe.");
-    }
-
-    req.foundUser = user; // eslint-disable-line no-param-reassign
-
-    return next();
-  } catch (err) {
-    return res.status(err.status ? err.status : 500).json({
-      success: false,
-      message: err.message,
-      status: err.status ? err.status : 500
-    })
-  }
-}
 
 /**
  * Get user
@@ -219,7 +190,7 @@ const create = async (req, res, next) => {
  * @returns {User}
  */
 const update = async (req, res, next) => {
-  const { name, username, birthday, email } = req.body;
+  const { name, birthday, cpf } = req.body;
   const { user } = req;
   const { userId } = req.params;
 
@@ -233,31 +204,19 @@ const update = async (req, res, next) => {
 
     const foundUsername = await User.findOne({
       where: {
-        [Op.or]: {
-          email,
-          username
-        },
-        id:{[Op.not]: userId}
+        cpf,
+        id:{[Op.not]: user.id}
       },
-      attributes: ['id', 'username', 'email']
+      attributes: ['id', 'cpf']
     })
     if(foundUsername) {
-      if(foundUsername.email === email)
-        throw new APIError("Este endereço de e-mail já está em uso.");
-      if(foundUsername.username === username)
-        throw new APIError("Este login já está em uso.");
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-    if (!emailRegex.test(email)) {
-      throw new APIError("Endereço de E-mail inválido.");
+      throw new APIError("Este cpf já está em uso.");
     }
 
     const updatedUser = await userFound.update({
       name,
-      username,
-      birthday,
-      email
+      cpf,
+      birthday
     }, { transaction: u });
 
     if (!updatedUser) {
@@ -426,6 +385,67 @@ const changePassword = async (req, res, next) => {
   }
 }
 
+const changeEmailUsername = async (req, res, next) => {
+  const { oldPassword, email=null, username=null } = req.body;
+  const { user } = req;
+
+  const u = await sequelize.transaction();
+  try {
+    const userFound = await User.findOne({
+      where: {
+        id: user.id,
+      }, attributes: ['id', 'password']
+    });
+
+    if (!(await User.passwordMatches(oldPassword, userFound.password))) {
+      throw new APIError("Senha atual informada é inválida.");
+    }
+
+    const foundUsername = await User.findOne({
+      where: {
+        [Op.or]: {
+          email,
+          username
+        },
+        id:{[Op.not]: user.id}
+      },
+      attributes: ['id', 'username', 'email']
+    })
+    if(foundUsername) {
+      if(foundUsername.email === email)
+        throw new APIError("Este endereço de e-mail já está em uso.");
+      if(foundUsername.username === username)
+        throw new APIError("Este login já está em uso.");
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    if (!emailRegex.test(email)) {
+      throw new APIError("Endereço de E-mail inválido.");
+    }
+
+    const updatedUser = await userFound.update({
+      email,
+      username
+    }, { transaction: u });
+    if(!updatedUser)
+      throw new APIError("Houve um erro ao tentar atualizar sua senha.");
+
+    await u.commit();
+
+    return res.json({
+      success: true,
+      message: "informações de acesso atualizadas com sucesso!"
+    });
+  } catch (err) {
+    await u.rollback();
+    return res.status(err.status ? err.status : 500).json({
+      message: err.message,
+      success: false,
+      status: err.status ? err.status : 500
+    });
+  }
+}
+
 /**
  * Get user list.
  * @returns {User[]}
@@ -531,11 +551,11 @@ export default {
   register,
   create, 
   get,
-  load, 
   update,
   updateByAdmin, 
   resetPassword,
   changePassword, 
+  changeEmailUsername,
   list,
   createUserImageUpload, 
 };

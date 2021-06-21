@@ -88,4 +88,15 @@ router.route('/change-password')
     }, {}),
     userCtrl.changePassword)
 
+router.route('/change-login')
+  .post(expressJwt({
+    secret: config.jwtSecret,
+  }),
+    validate(paramValidation.changeLogin, {
+      context: false,
+      keyByField: true,
+      statusCode: 400
+    }, {}),
+    userCtrl.changeEmailUsername)
+
 export default router;

@@ -75,10 +75,11 @@ const login = async (req, res, next) => {
 
     const token = User.sign(user);
 
-    // const menus = User.sideMenu(roles, user.User_Permissions);
+    const menus = User.sideMenu(user.role);
 
     return res.json({
       token,
+      menus,
       user: {
         id: user.id,
         name: user.name,
@@ -91,7 +92,7 @@ const login = async (req, res, next) => {
         birthday: user.birthday,
         cpf: user.cpf,
       },
-      redirect: '/dashboard',
+      redirect: '/fichas',
       success: true
     })
 
@@ -136,10 +137,11 @@ const token = async (req, res, next) => {
 
     const token = User.sign(foundUser);
 
-    // const menus = User.sideMenu(roles, foundUser.User_Permissions);
+    const menus = User.sideMenu(user.role);
 
     return res.json({
       token,
+      menus,
       user: {
         id: foundUser.id,
         name: foundUser.name,
@@ -152,7 +154,7 @@ const token = async (req, res, next) => {
         birthday: foundUser.birthday,
         cpf: foundUser.cpf,
       },
-      redirect: '/dashboard',
+      redirect: '/fichas',
       success: true
     })
 
