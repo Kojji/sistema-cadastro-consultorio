@@ -46,7 +46,7 @@ export default {
         birthday: Joi.string().required(), 
         email: Joi.string().required(), 
         cpf: Joi.string().required(), 
-        role: Joi.number().required(), 
+        role: Joi.number().allow(null), 
         confirmed: Joi.boolean().required(), 
         active: Joi.boolean().required(), 
       }),

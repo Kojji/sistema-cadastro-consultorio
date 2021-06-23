@@ -8,7 +8,7 @@ module.exports = {
       {
         name: 'Administrador Geral',
         username: 'admin',
-        email: 'admin',
+        email: 'admin@admin.com',
         password: '$2a$04$kf136laQMVcu3H39CjzVK.6FqhiIPOrOq4bGgEULeDJUSbNsGUp2G',
         confirmed: true,
         active: true,

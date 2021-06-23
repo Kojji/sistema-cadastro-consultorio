@@ -333,7 +333,7 @@ const resetPassword = async (req, res, next) => {
 
     return res.json({
       success: true,
-      message: "Senha retornada ao padrão '1234ab'com sucesso!"
+      message: "Senha retornada ao padrão '1234ab' com sucesso!"
     });
   } catch (err) {
     await u.rollback();
