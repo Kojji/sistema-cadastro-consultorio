@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
-    telefone: {
+    phone: {
       type: DataTypes.STRING,
       allowNull: true
     },

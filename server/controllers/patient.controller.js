@@ -1,16 +1,12 @@
 import APIError from '../helpers/APIError';
 import db from '../models';
 import { Op } from 'sequelize';
-import httpStatus from 'http-status';
 
 const { Patient,
   sequelize 
 } = db;
 
-/**
- * Get user
- * @returns {User}
- */
+// Get patient form
 const get = async (req, res) => {
   const { patientId } = req.params
   try {
@@ -39,8 +35,9 @@ const get = async (req, res) => {
   }
 }
 
+// Creates patient form
 const create = async (req, res) => {
-  const { name, externalFile, telefone, cpf } = req.body;
+  const { name, externalFile, phone, cpf } = req.body;
 
   const t = await sequelize.transaction();
   try {
@@ -57,7 +54,7 @@ const create = async (req, res) => {
     const createdPatient = await Patient.create({
       name,
       externalFile,
-      telefone,
+      phone,
       cpf,
       active: true
     }, {transaction: t})
@@ -81,8 +78,9 @@ const create = async (req, res) => {
   }
 }
 
+// Update patient form
 const update = async (req, res) => {
-  const { name, externalFile, telefone, cpf, active=true } = req.body;
+  const { name, externalFile, phone, cpf, active=true } = req.body;
   const { patientId } = req.params;
 
   const u = await sequelize.transaction();
@@ -109,7 +107,7 @@ const update = async (req, res) => {
     const updatedPatient = await foundPatient.update({
       name,
       externalFile,
-      telefone,
+      phone,
       cpf,
       active
     }, {transaction: u})
@@ -133,6 +131,7 @@ const update = async (req, res) => {
   }
 }
 
+// List patient forms
 const list = async (req, res) => {
   const { limit = 20, page = 1, active=true, search=null } = req.query;
   const offset = 0 + (parseInt(page) - 1) * limit;

@@ -1,14 +1,14 @@
 import express from 'express';
-import { validate, Joi } from 'express-validation';
+import { validate } from 'express-validation';
 import paramValidation from '../../config/param-validation';
 import userCtrl from '../controllers/user.controller';
 import expressJwt from "express-jwt";
 import config from "../../config/vars";
-import multer from 'multer';
+// import multer from 'multer';
 
-const storage = multer.memoryStorage();
+// const storage = multer.memoryStorage();
 
-const upload = multer({ storage: storage });
+// const upload = multer({ storage: storage });
 
 const router = express.Router(); // eslint-disable-line new-cap
 
@@ -70,12 +70,12 @@ router.route('/:userId')
     statusCode: 400
   }, {}), userCtrl.update);
 
-router.route('/upload')
-  .post(
-    expressJwt({ secret: config.jwtSecret }),
-    upload.single('file'),
-    userCtrl.createUserImageUpload
-  )
+// router.route('/upload')
+//   .post(
+//     expressJwt({ secret: config.jwtSecret }),
+//     upload.single('file'),
+//     userCtrl.createUserImageUpload
+//   )
 
 router.route('/change-password')
   .post(expressJwt({

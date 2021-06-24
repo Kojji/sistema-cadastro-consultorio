@@ -1,9 +1,7 @@
-import httpStatus from 'http-status';
-import crypto from "crypto-js";
 import db from '../models';
 import APIError from '../helpers/APIError';
 import replaceSpecialChars from "../helpers/textNormalize";
-import EmailProvider from "../services/emails/email.provider";
+// import EmailProvider from "../services/emails/email.provider";
 // import fs from 'fs';
 import path from 'path';
 import fs from 'fs-extra';
@@ -14,10 +12,7 @@ const { User,
   sequelize 
 } = db;
 
-/**
- * Get user
- * @returns {User}
- */
+// Gets any user info if admin, otherwise gets only own user info
 const get = async (req, res) => {
   const { userId } = req.params;
   const { user } = req;
@@ -51,10 +46,8 @@ const get = async (req, res) => {
     });
   }
 }
-/**
- * Register new user
- * @returns {User}
- */
+
+// Register own user 
 const register = async (req, res, next) => {
   const { name, email, username, birthday, cpf, password } = req.body;
   const t = await sequelize.transaction();
@@ -115,10 +108,7 @@ const register = async (req, res, next) => {
   }
 }
 
-/**
- * Create new user
- * @returns {User}
- */
+// Admin creates a user 
 const create = async (req, res, next) => {
   const { name, email, username, birthday, cpf, password='1234ab', role=2 } = req.body;
   const { user } = req;
@@ -185,10 +175,7 @@ const create = async (req, res, next) => {
   }
 }
 
-/**
- * Update existing user
- * @returns {User}
- */
+// User updates own info
 const update = async (req, res, next) => {
   const { name, birthday, cpf } = req.body;
   const { user } = req;
@@ -239,10 +226,7 @@ const update = async (req, res, next) => {
   }
 }
 
-/**
- * Update existing user
- * @returns {User}
- */
+// Admin updates user info
 const updateByAdmin = async (req, res, next) => {
   const { name, username, birthday, email, cpf, role=2, confirmed, active=true } = req.body;
   const { user } = req;
@@ -307,6 +291,7 @@ const updateByAdmin = async (req, res, next) => {
   }
 }
 
+// Admin resets user password
 const resetPassword = async (req, res, next) => {
   const { user } = req;
   const { userId } = req.params;
@@ -345,6 +330,7 @@ const resetPassword = async (req, res, next) => {
   }
 }
 
+// User changes own password
 const changePassword = async (req, res, next) => {
   const { oldPassword, password } = req.body;
   const { user } = req;
@@ -385,6 +371,7 @@ const changePassword = async (req, res, next) => {
   }
 }
 
+// User changes own email or login
 const changeEmailUsername = async (req, res, next) => {
   const { oldPassword, email=null, username=null } = req.body;
   const { user } = req;
@@ -446,10 +433,7 @@ const changeEmailUsername = async (req, res, next) => {
   }
 }
 
-/**
- * Get user list.
- * @returns {User[]}
- */
+// Admin lists users
 const list = async (req, res, next) => {
   const { limit = 20, page = 1, confirmed=null } = req.query;
   const { user } = req;
@@ -495,6 +479,7 @@ const list = async (req, res, next) => {
   }
 }
 
+// Photo upload by user (unused)
 const createUserImageUpload = async (req, res, next) => {
   const { file, user } = req;
 
@@ -540,12 +525,6 @@ const createUserImageUpload = async (req, res, next) => {
     })
   }
 }
-
-/**
- * Delete user.
- * 
- * It is not possible to delete any user under any circumstances.
- */
 
 export default {
   register,
