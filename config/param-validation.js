@@ -91,7 +91,7 @@ export default {
         body: Joi.object({
           name: Joi.string().required(),
           externalFile: Joi.string().required().allow(''),
-          telefone: Joi.string().required().allow(''),
+          phone: Joi.string().required().allow(''),
           cpf: Joi.string().required().allow('')
         }),
     },
@@ -101,7 +101,7 @@ export default {
         body: Joi.object({
           name: Joi.string().required(),
           externalFile: Joi.string().required().allow(''),
-          telefone: Joi.string().required().allow(''),
+          phone: Joi.string().required().allow(''),
           cpf: Joi.string().required().allow(''),
           active: Joi.boolean().allow(null),
         }),

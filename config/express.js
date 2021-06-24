@@ -12,11 +12,6 @@ import config from './vars';
 import logger from './winston/get-default-logger';
 import routes from '../server/routes/index.route';
 import APIError from '../server/helpers/APIError';
-import { fileCleaningScript, ClassroomCodeCleaningScript, StudyGroupDeactivateScript } from '../server/helpers/cronScript';
-import { createServer } from "http";
-import { Server } from "socket.io";
-import jwt from "jsonwebtoken";
-import db from '../server/models';
 
 
 // Define default HTTP logger instance (use default logger instance)
@@ -24,9 +19,6 @@ const winstonInstance = logger;
 
 const app = express();
 
-// fileCleaningScript();
-// ClassroomCodeCleaningScript();
-// StudyGroupDeactivateScript();
 // parse body params and attache them to req.body
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -49,7 +41,7 @@ app.use(
 );
 
 // app.use(express.static("uploads"));
-app.use('/static', express.static(process.env.NODE_ENV === 'production' ? '/var/www/api.teachlearn.com.br/static' : 'static'))
+// app.use('/static', express.static(process.env.NODE_ENV === 'production' ? '/var/www/api.teachlearn.com.br/static' : 'static'))
 
 // This is really just a test output and should be the first thing you see
 winstonInstance.info('The application is starting...');
