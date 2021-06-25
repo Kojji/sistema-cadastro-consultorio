@@ -37,7 +37,22 @@ const get = async (req, res) => {
 
 // Creates patient form
 const create = async (req, res) => {
-  const { name, externalFile, phone, cpf } = req.body;
+  const { 
+    name,
+    externalFile,
+    phone,
+    cpf,
+    postalCode='',
+    state='',
+    city='',
+    block='',
+    street='',
+    number=null,
+    extra='',
+    email='',
+    emitReceipt=false,
+    active=true
+  } = req.body;
 
   const t = await sequelize.transaction();
   try {
@@ -50,13 +65,27 @@ const create = async (req, res) => {
     if(foundPatient) {
       throw new APIError("Um cadastro com este nome e cpf já foi gerado.");
     }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    if (!emailRegex.test(email)) {
+      throw new APIError("Endereço de E-mail inválido.");
+    }
     
     const createdPatient = await Patient.create({
       name,
       externalFile,
       phone,
       cpf,
-      active: true
+      postalCode,
+      state,
+      city,
+      block,
+      street,
+      number,
+      extra,
+      email,
+      emitReceipt,
+      active
     }, {transaction: t})
 
     if(!createdPatient)
@@ -80,7 +109,22 @@ const create = async (req, res) => {
 
 // Update patient form
 const update = async (req, res) => {
-  const { name, externalFile, phone, cpf, active=true } = req.body;
+  const { 
+    name,
+    externalFile,
+    phone,
+    cpf,
+    postalCode,
+    state,
+    city,
+    block,
+    street,
+    number,
+    extra,
+    email,
+    emitReceipt,
+    active=true
+  } = req.body;
   const { patientId } = req.params;
 
   const u = await sequelize.transaction();
@@ -109,6 +153,15 @@ const update = async (req, res) => {
       externalFile,
       phone,
       cpf,
+      postalCode,
+      state,
+      city,
+      block,
+      street,
+      number,
+      extra,
+      email,
+      emitReceipt,
       active
     }, {transaction: u})
 

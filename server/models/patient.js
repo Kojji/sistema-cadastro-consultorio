@@ -33,7 +33,43 @@ module.exports = (sequelize, DataTypes) => {
     active: {
       type: DataTypes.BOOLEAN,
       allowNull: false
-    }
+    },
+    postalCode: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    state: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    city: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    block: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    street: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    number: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    extra: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    email: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    emitReceipt: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false
+    },
   }, {
     sequelize,
     modelName: 'Patient',
