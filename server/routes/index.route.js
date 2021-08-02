@@ -3,6 +3,7 @@ import userRoutes from './user.route';
 import authRoutes from './auth.route';
 import patientRoutes from './patient.route';
 import utilsRoutes from './utils.route';
+import appointmentsRoutes from './appointments.route';
 
 const router = express.Router(); // eslint-disable-line new-cap
 
@@ -12,10 +13,13 @@ router.use('/users', userRoutes);
 // mount auth routes at /auth
 router.use('/auth', authRoutes);
 
-// mount auth routes at /patients
+// mount patients routes at /patients
 router.use('/patients', patientRoutes);
 
-// mount auth routes at /utils
+// mount utils routes at /utils
 router.use('/utils', utilsRoutes);
+
+// mount appointments routes at /appointments
+router.use('/appointments', appointmentsRoutes);
 
 export default router;

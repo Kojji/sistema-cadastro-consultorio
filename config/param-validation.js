@@ -1,5 +1,4 @@
 import { Joi } from 'express-validation'
-import { allow, valid } from 'joi/lib/types/lazy';
 
 export default {
     // POST /api/users/register
@@ -22,7 +21,7 @@ export default {
           username: Joi.string().required(),
           birthday: Joi.string().required(),
           cpf: Joi.string().required(),
-          role: Joi.number().valid(1,2).required()
+          role: Joi.number().valid(1,2,3).required()
       }),
     },
 
@@ -124,6 +123,40 @@ export default {
           emitReceipt: Joi.boolean().required(),
           active: Joi.boolean().required(),
         }),
+        params: Joi.object({
+          patientId: Joi.string().hex().required(),
+        }),
+    },
+
+    // POST /api/appointments/
+    createAppointment: {
+      body: Joi.object({
+        PatientId: Joi.number().allow(null),
+        title: Joi.string().required(),
+        details: Joi.string().required().allow(''),
+        date: Joi.string().required(),
+        duration: Joi.number(),
+        time: Joi.string().required(),
+        bgcolor: Joi.string().allow(null),
+        active: Joi.boolean().required()
+      }),
+    },
+
+    // POST /api/appointments/
+    updateAppointment: {
+      body: Joi.object({
+        PatientId: Joi.number().allow(null),
+        title: Joi.string().required(),
+        details: Joi.string().required().allow(''),
+        date: Joi.string().required(),
+        duration: Joi.number(),
+        time: Joi.string().required(),
+        bgcolor: Joi.string().allow(null),
+        active: Joi.boolean().required()
+      }),
+      params: Joi.object({
+        appointmentId: Joi.string().hex().required(),
+      }),
     },
 
     // UPDATE /api/users/files/:fileId

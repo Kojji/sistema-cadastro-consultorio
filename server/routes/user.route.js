@@ -54,14 +54,14 @@ router.route('/reset/:userId')
     secret: config.jwtSecret,
   }), userCtrl.resetPassword);
 
-router.route('/:userId')
+router.route('/user/:userId')
 
-  /** GET /api/users/:userId - Get user */
+  /** GET /api/users/user/:userId - Get user */
   .get(expressJwt({
     secret: config.jwtSecret,
   }), userCtrl.get)
 
-  /** PUT /api/users/:userId - Update user */
+  /** PUT /api/users/user/:userId - Update user */
   .put(expressJwt({
     secret: config.jwtSecret,
   }), validate(paramValidation.updateUser, {

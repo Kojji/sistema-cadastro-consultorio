@@ -234,4 +234,49 @@ const list = async (req, res) => {
   }
 }
 
-export default { get, create, update, list }
+// List patient by search
+const searchName = async (req, res) => {
+  const { limit = 10, page = 1, active=true, search=null } = req.query;
+  const offset = 0 + (parseInt(page) - 1) * limit;
+  try {
+    let where = {}
+    if (!!search) {
+      where = {
+        [Op.or]: {
+          name: {
+            [Op.iLike]: `%${search}%`
+          }
+        }
+      }
+    }
+    where = {...where, active}
+    const patients = await Patient.findAndCountAll({
+      where,
+      attributes: ['id', 'name'],
+      order: [['name', 'ASC']],
+      limit,
+      offset
+    })
+    if(!patients)
+      throw new APIError("Houve um erro ao listar fichas de pacientes.");
+
+    return res.json({
+      success: true,
+      patients: patients.rows,
+      pagination: {
+        limit,
+        offset,
+        page: parseInt(page),
+        count: patients.count,
+        nextPage: offset + limit <= patients.count
+      }
+    })
+  } catch (err) {
+    return res.status(err.status ? err.status : 500).json({
+      success: false,
+      message: err.message
+    })
+  }
+}
+
+export default { get, create, update, list, searchName }

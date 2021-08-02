@@ -8,7 +8,7 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
-      // define association here
+      models.User.hasMany(models.Appointment)
     }
 
     static passwordMatches(password, modelPassword) {
@@ -40,6 +40,13 @@ module.exports = (sequelize, DataTypes) => {
       
       if (role === 1) {
         menu.push({
+          label: 'Agenda',
+          url: '/consultas',
+          external: false,
+          icon: 'today'
+        })
+
+        menu.push({
           label: 'Fichas',
           url: '/fichas',
           external: false,
@@ -52,12 +59,27 @@ module.exports = (sequelize, DataTypes) => {
           external: false,
           icon: 'group'
         })
+
       } else if(role === 2) {
+        menu.push({
+          label: 'Agenda',
+          url: '/consultas',
+          external: false,
+          icon: 'today'
+        })
+
         menu.push({
           label: 'Fichas',
           url: '/fichas',
           external: false,
           icon: 'topic'
+        })
+      } else if(role === 3) {
+        menu.push({
+          label: 'Agenda',
+          url: '/consultas',
+          external: false,
+          icon: 'today'
         })
       }
 

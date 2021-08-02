@@ -21,12 +21,12 @@ router.route('/')
     statusCode: 400
   }, {}), patientCtrl.create);
 
-router.route('/:patientId')
-  //GET /api/patients/:patientId - Get patient form
+router.route('/patient/:patientId')
+  //GET /api/patients/patient/:patientId - Get patient form
   .get(expressJwt({
     secret: config.jwtSecret,
   }),patientCtrl.get)
-  //PUT /api/patients/:patientId - Update patient form
+  //PUT /api/patients/patient/:patientId - Update patient form
   .put(expressJwt({
     secret: config.jwtSecret,
   }),validate(paramValidation.updatePatient, {
@@ -34,5 +34,11 @@ router.route('/:patientId')
     keyByField: true,
     statusCode: 400
   }, {}),patientCtrl.update);
+
+router.route('/name')
+  //GET /api/patients/name - Get list of patients names
+  .get(expressJwt({
+    secret: config.jwtSecret,
+  }),patientCtrl.searchName)
 
 export default router;
