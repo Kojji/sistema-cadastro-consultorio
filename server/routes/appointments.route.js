@@ -37,8 +37,6 @@ router.route('/appointment/:appointmentId')
 
 router.route('/limited')
   //GET /api/appointments/limited - Get agenda without personal info
-  .get(expressJwt({
-    secret: config.jwtSecret,
-  }),appointmentCtrl.listLimited);
+  .get(appointmentCtrl.listLimited);
 
 export default router;
