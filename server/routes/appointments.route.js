@@ -11,10 +11,12 @@ router.route('/')
   //GET /api/appointments - Get list of patients forms
   .get(expressJwt({
     secret: config.jwtSecret,
+    algorithms: config.jwtAlgorithm
   }),appointmentCtrl.list)
   //POST /api/appointments - Creates patient form
   .post(expressJwt({
     secret: config.jwtSecret,
+    algorithms: config.jwtAlgorithm
   }),validate(paramValidation.createAppointment, {
     context: false,
     keyByField: true,
@@ -25,10 +27,12 @@ router.route('/appointment/:appointmentId')
   //GET /api/appointments/appointment/:patientId - Get patient form
   .get(expressJwt({
     secret: config.jwtSecret,
+    algorithms: config.jwtAlgorithm
   }),appointmentCtrl.get)
   //PUT /api/appointments/appointment/:patientId - Update patient form
   .put(expressJwt({
     secret: config.jwtSecret,
+    algorithms: config.jwtAlgorithm
   }),validate(paramValidation.updateAppointment, {
     context: false,
     keyByField: true,

@@ -18,7 +18,9 @@ router.route('/login')
 router.route('/token')
   // POST /api/auth/token - update token
   .post(expressJwt(
-    { secret: config.jwtSecret }
+    { secret: config.jwtSecret,
+      algorithms: config.jwtAlgorithm
+    }
   ),authCtrl.token);
 
 export default router;

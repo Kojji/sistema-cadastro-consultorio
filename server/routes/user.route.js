@@ -25,6 +25,7 @@ router.route('/edit/:userId')
   /** GET /api/users/fetch - Get list of users by name */
   .put(expressJwt({
     secret: config.jwtSecret,
+    algorithms: config.jwtAlgorithm
   }),validate(paramValidation.editUser, {
     context: false,
     keyByField: true,
@@ -37,12 +38,14 @@ router.route('/')
   /** GET /api/users - Get list of users */
   .get(expressJwt({
     secret: config.jwtSecret,
+    algorithms: config.jwtAlgorithm
   }), userCtrl.list
   )
 
   /** POST /api/users - Create new user */
   .post(expressJwt({
     secret: config.jwtSecret,
+    algorithms: config.jwtAlgorithm
   }), validate(paramValidation.createUser, {
     context: false,
     keyByField: true,
@@ -52,6 +55,7 @@ router.route('/')
 router.route('/reset/:userId')
   .post(expressJwt({
     secret: config.jwtSecret,
+    algorithms: config.jwtAlgorithm
   }), userCtrl.resetPassword);
 
 router.route('/user/:userId')
@@ -59,11 +63,13 @@ router.route('/user/:userId')
   /** GET /api/users/user/:userId - Get user */
   .get(expressJwt({
     secret: config.jwtSecret,
+    algorithms: config.jwtAlgorithm
   }), userCtrl.get)
 
   /** PUT /api/users/user/:userId - Update user */
   .put(expressJwt({
     secret: config.jwtSecret,
+    algorithms: config.jwtAlgorithm
   }), validate(paramValidation.updateUser, {
     context: false,
     keyByField: true,
@@ -80,6 +86,7 @@ router.route('/user/:userId')
 router.route('/change-password')
   .post(expressJwt({
     secret: config.jwtSecret,
+    algorithms: config.jwtAlgorithm
   }),
     validate(paramValidation.changePassword, {
       context: false,
@@ -91,6 +98,7 @@ router.route('/change-password')
 router.route('/change-login')
   .post(expressJwt({
     secret: config.jwtSecret,
+    algorithms: config.jwtAlgorithm
   }),
     validate(paramValidation.changeLogin, {
       context: false,

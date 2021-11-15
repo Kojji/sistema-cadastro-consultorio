@@ -52,6 +52,7 @@ const config = {
     port: envVars.PORT,
     apiVersion: envVars.API_VERSION,
     jwtSecret: envVars.JWT_SECRET,
+    jwtAlgorithm: [envVars.JWT_ALG],
     postgres: {
         db: isTestEnvironment ? envVars.UNIQUE_NAME_PG_TEST_DB : envVars.UNIQUE_NAME_PG_DB,
         port: envVars.UNIQUE_NAME_PG_PORT,

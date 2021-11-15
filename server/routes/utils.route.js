@@ -11,6 +11,7 @@ router.route('/postalCode/:postalCode')
   //GET /api/postalCode/:postalCode - Get postal code info
   .get(expressJwt({
     secret: config.jwtSecret,
+    algorithms: config.jwtAlgorithm
   }),utilsCtrl.getPostalCode);
 
 export default router;
