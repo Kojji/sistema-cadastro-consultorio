@@ -228,8 +228,12 @@ const list = async (req, res) => {
       success: true,
       patients: patients.rows,
       pagination: {
+        search,
+        active,
         limit,
         offset,
+        column,
+        order,
         page: parseInt(page),
         count: patients.count,
         nextPage: offset + limit <= patients.count
