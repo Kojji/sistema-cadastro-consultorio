@@ -186,8 +186,8 @@ const update = async (req, res) => {
 
 // List patient forms
 const list = async (req, res) => {
-  const { limit = 20, page = 1, active=true, search=null } = req.query;
-  const offset = 0 + (parseInt(page) - 1) * limit;
+  const { limit = '20', page = 1, column='name', order='ASC', active=true, search=null } = req.query;
+  const offset = 0 + (parseInt(page) - 1) * parseInt(limit);
   try {
     let where = {}
     if (!!search) {
@@ -198,9 +198,16 @@ const list = async (req, res) => {
           },
           cpf: {
             [Op.iLike]: `%${search}%`
+          },
+          externalFile: {
+            [Op.iLike]: `%${search}%`
           }
         }
       }
+    }
+    let toOrder = [['name', order]]
+    if (column !== 'name') {
+      toOrder = [[column, order], ['name', 'ASC']]
     }
     where = {...where, active}
     const patients = await Patient.findAndCountAll({
@@ -208,8 +215,8 @@ const list = async (req, res) => {
       attributes: {
         exclude:['updatedAt']
       },
-      order: [['name', 'ASC']],
-      limit,
+      order: toOrder,
+      limit: parseInt(limit),
       offset
     })
     if(!patients)
@@ -219,8 +226,12 @@ const list = async (req, res) => {
       success: true,
       patients: patients.rows,
       pagination: {
+        search,
+        active,
         limit,
         offset,
+        column,
+        order,
         page: parseInt(page),
         count: patients.count,
         nextPage: offset + limit <= patients.count
