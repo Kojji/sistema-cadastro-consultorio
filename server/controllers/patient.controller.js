@@ -66,9 +66,11 @@ const create = async (req, res) => {
       throw new APIError("Um cadastro com este nome e cpf já foi gerado.");
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-    if (!emailRegex.test(email)) {
-      throw new APIError("Endereço de E-mail inválido.");
+    if(emitReceipt) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+      if (!emailRegex.test(email)) {
+        throw new APIError("Endereço de E-mail inválido.");
+      }
     }
     
     const createdPatient = await Patient.create({
@@ -234,7 +236,7 @@ const list = async (req, res) => {
         order,
         page: parseInt(page),
         count: patients.count,
-        nextPage: offset + limit <= patients.count
+        nextPage: offset + parseInt(limit) < patients.count
       }
     })
   } catch (err) {

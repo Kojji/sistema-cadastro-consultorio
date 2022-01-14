@@ -39,12 +39,12 @@ module.exports = (sequelize, DataTypes) => {
       const menu = [];
       
       if (role === 1) {
-        menu.push({
-          label: 'Agenda',
-          url: '/consultas',
-          external: false,
-          icon: 'today'
-        })
+        // menu.push({
+        //   label: 'Agenda',
+        //   url: '/consultas',
+        //   external: false,
+        //   icon: 'today'
+        // })
 
         menu.push({
           label: 'Fichas',
@@ -61,12 +61,12 @@ module.exports = (sequelize, DataTypes) => {
         })
 
       } else if(role === 2) {
-        menu.push({
-          label: 'Agenda',
-          url: '/consultas',
-          external: false,
-          icon: 'today'
-        })
+        // menu.push({
+        //   label: 'Agenda',
+        //   url: '/consultas',
+        //   external: false,
+        //   icon: 'today'
+        // })
 
         menu.push({
           label: 'Fichas',
@@ -76,11 +76,17 @@ module.exports = (sequelize, DataTypes) => {
         })
       } else if(role === 3) {
         menu.push({
-          label: 'Agenda',
-          url: '/consultas',
+          label: 'Fichas',
+          url: '/fichas',
           external: false,
-          icon: 'today'
+          icon: 'topic'
         })
+        // menu.push({
+        //   label: 'Agenda',
+        //   url: '/consultas',
+        //   external: false,
+        //   icon: 'today'
+        // })
       }
 
       return menu;
